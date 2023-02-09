@@ -3,14 +3,7 @@ package mason.api.models.libraries
 import cats.syntax.functor._
 import io.circe._
 import io.circe.generic.auto._
-import io.circe.generic.extras.Configuration
-import io.circe.generic.extras.semiauto.deriveEnumerationCodec
 import io.circe.syntax._
-import sttp.client3._
-import sttp.client3.circe._
-import sttp.model.Method
-
-import scala.util.Either
 
 object ClusterStatus {
 

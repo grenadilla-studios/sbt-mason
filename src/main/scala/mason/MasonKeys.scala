@@ -2,6 +2,8 @@ package mason
 
 import sbt._
 
+import java.io.File
+
 trait MasonKeys {
   lazy val masonPublishLibrary =
     taskKey[Unit]("Publish the project JAR to configured Databricks cluster.")
