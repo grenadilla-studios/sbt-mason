@@ -7,11 +7,13 @@ lazy val root = (project withId "sbt-mason" in file("."))
     organization := "com.grenadillastudios",
     version      := "0.1.0-SNAPSHOT",
     sbtPlugin    := true,
+    publishTo := sonatypePublishToBundle.value,
     scalacOptions += "-Ywarn-unused-import",
     semanticdbEnabled                                       := true,
     Global / onChangedBuildSource                           := ReloadOnSourceChanges,
     Global / semanticdbVersion                              := scalafixSemanticdb.revision,
     Global / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
+    Global / scalafixScalaBinaryVersion                     := "2.12",
     scriptedLaunchOpts += ("-Dplugin.version=" + version.value),
     scriptedBufferLog := false,
     libraryDependencies ++= Seq(
@@ -23,3 +25,26 @@ lazy val root = (project withId "sbt-mason" in file("."))
       "com.softwaremill.sttp.client3" %% "circe"                % sttpVersion
     )
   )
+
+ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
+
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/grenadilla-studios/sbt-mason"),
+    "scm:git@github.com:grenadilla-studios/sbt-mason.git"
+  )
+)
+
+ThisBuild / developers := List(
+  Developer(
+    id = "btrachey",
+    name = "Brian Tracey",
+    email = "brian@grenadilla-studios.com",
+    url = url("https://github.com/btrachey")
+  )
+)
+
+ThisBuild / description := "sbt plugin for managing artifacts in Databricks"
+ThisBuild / homepage    := Some(url("https://github.com/grenadilla-studios/sbt-mason"))
+ThisBuild / licenses := Seq("MIT" -> url("https://github.com/sbt/sbt-assembly/blob/master/LICENSE"))
+ThisBuild / publishMavenStyle := true
