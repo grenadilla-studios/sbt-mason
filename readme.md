@@ -19,3 +19,12 @@ cluster specified with `masonClusterId` 3) restarts that cluster if it is runnin
 updated library takes effect.
 * `masonRemoveLibrary` - this task looks for libraries installed on the `masonClusterId` cluster and
 removes them if they match `masonLibraryName`.
+
+### Contributors
+All changes merged to `main` are automatically released to Maven central as snapshot releases. In
+order to make a full release, take the following actions:
+* check out the latest changes on the `main` branch
+* tag the branch with the next appropriate release version and push the tag
+  ```git tag -a vX.Y.Z -m "vX.Y.Z"
+     git push origin vX.YZ```
+* go to the releases page and publish the draft release notes
