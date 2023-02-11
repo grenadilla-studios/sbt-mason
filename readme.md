@@ -25,6 +25,10 @@ All changes merged to `main` are automatically released to Maven central as snap
 order to make a full release, take the following actions:
 * check out the latest changes on the `main` branch
 * tag the branch with the next appropriate release version and push the tag
-  ```git tag -a vX.Y.Z -m "vX.Y.Z"
-     git push origin vX.YZ```
+  
+  ```
+  git tag -a vX.Y.Z -m "vX.Y.Z"
+  git push origin vX.YZ
+  ```
+  
 * go to the releases page and publish the draft release notes
