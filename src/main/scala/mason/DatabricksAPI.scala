@@ -9,6 +9,7 @@ import sttp.client3.circe._
 import sttp.model.Method
 
 import java.nio.file.Path
+
 import scala.util.{Either, Left, Right}
 
 class DatabricksAPI(

@@ -1,17 +1,21 @@
 val circeVersion = "0.14.3"
 val sttpVersion  = "3.8.8"
 
+lazy val writeHooks = taskKey[Unit]("Write git hooks")
+Global / writeHooks := GitHooks(file("git-hooks"), file(".git/hooks"), streams.value.log)
+
+lazy val formatAll      = taskKey[Unit]("Run all code formatting.")
+lazy val formatCheckAll = taskKey[Unit]("Check all code formatting.")
+
 lazy val root = (project withId "sbt-mason" in file("."))
   .enablePlugins(SbtPlugin)
   .settings(
-    name              := "sbt-mason",
-    organization      := "com.grenadillastudios",
-    // version           := "0.1.0-SNAPSHOT",
-    sbtPlugin         := true,
-    // publishMavenStyle := true,
-    // publishTo         := sonatypePublishToBundle.value,
+    name         := "sbt-mason",
+    organization := "com.grenadillastudios",
+    sbtPlugin    := true,
     scalacOptions += "-Ywarn-unused-import",
-    semanticdbEnabled                                       := true,
+    semanticdbEnabled := true,
+    Global / onLoad ~= (_ andThen ("writeHooks" :: _)),
     Global / onChangedBuildSource                           := ReloadOnSourceChanges,
     Global / semanticdbVersion                              := scalafixSemanticdb.revision,
     Global / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0",
@@ -26,14 +30,11 @@ lazy val root = (project withId "sbt-mason" in file("."))
       "com.softwaremill.sttp.client3" %% "core"                 % sttpVersion,
       "com.softwaremill.sttp.client3" %% "circe"                % sttpVersion
     ),
-    // credentials += {
-    //   Credentials(Path.userHome / ".sbt" / "sonatype_credentials")
-    // },
     versionScheme := Some("semver-spec")
   )
 
 ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
-ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
+ThisBuild / sonatypeRepository     := "https://s01.oss.sonatype.org/service/local"
 ThisBuild / scmInfo := Some(
   ScmInfo(
     url("https://github.com/grenadilla-studios/sbt-mason"),
@@ -53,3 +54,15 @@ ThisBuild / developers := List(
 ThisBuild / description := "sbt plugin for managing artifacts in Databricks"
 ThisBuild / homepage    := Some(url("https://github.com/grenadilla-studios/sbt-mason"))
 ThisBuild / licenses := Seq("MIT" -> url("https://github.com/sbt/sbt-assembly/blob/master/LICENSE"))
+
+formatAll := {
+  val sbt = (Compile / scalafmtSbt).value
+  val fmt = scalafmtAll.value
+  scalafixAll.toTask("").value
+}
+
+formatCheckAll := {
+  val sbt = (Compile / scalafmtSbtCheck).value
+  val fmt = scalafmtCheckAll.value
+  scalafixAll.toTask(" --check").value
+}

@@ -1,0 +1,24 @@
+#! /usr/bin/env bash
+
+echo_color() {
+  # first arg is color name
+  # second arg is the string
+  declare -A colors
+  colors=([green]='\033[0;32m' [red]='\033[0;31m' [clear]='\033[0m')
+  if [[ -n ${colors[$1]} ]]; then
+    echo -e "${colors[$1]}$2${colors[clear]}"
+  else
+    echo "$2"
+  fi
+}
+
+CHANGED_FILES="$(git diff --name-only --cached --diff-filter=ACMR | grep -E "src/.*|project/.*")"
+if [[ -n "$CHANGED_FILES" ]]; then
+  echo_color green "Running pre-commit git hook..."
+  if ! sbt 'formatCheckAll'; then
+    echo_color red "Pre-push hook failed - please run sbt formatAll"
+    exit 1
+  else
+    echo_color green "Pre-push hook succeedeed"
+  fi
+fi

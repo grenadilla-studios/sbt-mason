@@ -4,6 +4,7 @@ import sbt.Keys._
 import sbt._
 
 import java.nio.file.Files
+
 import scala.jdk.CollectionConverters._
 
 object MasonPlugin extends AutoPlugin {
