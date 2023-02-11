@@ -8,4 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
-      - run: sbt 'scalafixAll --check; scalafmtSbtCheck; scalafmtCheckAll'
+      - run: sbt 'formatCheckAll'
