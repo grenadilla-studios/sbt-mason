@@ -1,7 +1,10 @@
 name: CI
 on: 
   push:
-  pull_request:
+    paths: 
+      - '**.sbt'
+      - 'src/**'
+      - 'project/**'
 jobs:
   build:
     runs-on: ubuntu-latest
