@@ -28,7 +28,7 @@ order to make a full release, take the following actions:
   
   ```
   git tag -a vX.Y.Z -m "vX.Y.Z"
-  git push origin vX.YZ
+  git push origin vX.Y.Z
   ```
   
 * go to the releases page and publish the draft release notes
