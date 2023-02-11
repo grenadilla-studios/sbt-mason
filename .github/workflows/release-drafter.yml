@@ -5,9 +5,15 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   update_release_draft:
-    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
     steps:
       - uses: release-drafter/release-drafter@v5
         env:
