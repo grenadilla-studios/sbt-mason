@@ -11,4 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
+        with:
+          cache: sbt
       - run: sbt 'formatCheckAll'
