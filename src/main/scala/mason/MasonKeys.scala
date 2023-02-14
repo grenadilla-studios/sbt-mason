@@ -2,15 +2,36 @@ package mason
 
 import sbt._
 
-import java.io.File
-
 trait MasonKeys {
   lazy val masonPublishLibrary =
-    taskKey[Unit]("Publish the project JAR to configured Databricks cluster.")
+    taskKey[Boolean]("Publish the project JAR to configured Databricks cluster.")
 
   lazy val masonRemoveLibrary = taskKey[Boolean](
     "Remove existing versions of the project from the configured Databricks cluster."
   )
+
+  lazy val masonUploadFile = taskKey[Boolean](
+    "Upload a file from a source location into Databricks."
+  )
+
+  lazy val masonOverwriteFileUploads = settingKey[Boolean](
+    """|Whether to overwrite uploaded files when uploading to Databricks.
+       |If set to false and the file already exists in Databricks, the upload task will fail.
+       |""".stripMargin
+  )
+
+  lazy val masonArtifactDestinationDir = settingKey[String](
+    "The location in Databricks FS to store uploaded artifacts - default is `/FileStore/jars`."
+  )
+
+  lazy val masonSourceFileLoc = settingKey[String](
+    "The default location to look for files when uploading to Databricks."
+  )
+
+  lazy val masonDestinationFileLoc = settingKey[String](
+    "The default location in Databricks to upload files."
+  )
+
   lazy val masonClusterId =
     settingKey[String]("Cluster ID to use for publishing.")
 
@@ -24,14 +45,5 @@ trait MasonKeys {
 
   lazy val masonLibraryName = settingKey[String](
     "The name of the library being managed by this plugin; will be used for matching against already installed versions of libraries on clusters."
-  )
-
-  // values from zip sample plugin
-  lazy val sourceZipDir =
-    settingKey[File]("source directory to generate zip from")
-  lazy val targetZipDir =
-    settingKey[File]("target directory to store generated zip")
-  lazy val zip = taskKey[Unit](
-    "generates zip file which includes all files from sourceZipDir"
   )
 }

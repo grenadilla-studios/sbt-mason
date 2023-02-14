@@ -14,12 +14,17 @@ object MasonPlugin extends AutoPlugin {
   import autoImport._
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
-    masonClusterId       := "",
-    masonConfigFile      := None,
-    masonEnvironmentName := "DEFAULT",
-    masonPublishLibrary  := publishTask.value,
-    masonRemoveLibrary   := removeLib.value,
-    masonLibraryName     := name.value
+    masonClusterId              := "",
+    masonConfigFile             := None,
+    masonEnvironmentName        := "DEFAULT",
+    masonSourceFileLoc          := "",
+    masonDestinationFileLoc     := "",
+    masonArtifactDestinationDir := "/FileStore/jars/",
+    masonOverwriteFileUploads   := true,
+    masonUploadFile             := uploadTask.value,
+    masonPublishLibrary         := publishTask.value,
+    masonRemoveLibrary          := removeLib.value,
+    masonLibraryName            := name.value
   )
 
   private def removeLib = Def.task {
@@ -60,6 +65,7 @@ object MasonPlugin extends AutoPlugin {
       }
     }
   }
+
   private def publishTask = Def.task {
     implicit val log = sLog.value
     val configParser = new DatabricksConfigParser(masonConfigFile.value)
@@ -94,7 +100,7 @@ object MasonPlugin extends AutoPlugin {
         log.info(
           s"Uploading ${matchedJars.head.toString} to cluster ${masonClusterId.value}."
         )
-        val uploaded = api.uploadJar(matchedJars.head)
+        val uploaded = api.uploadJar(matchedJars.head, masonArtifactDestinationDir.value)
         uploaded match {
           case Some(uploadedPath) => {
             val installed = api.installJar(masonClusterId.value, uploadedPath)
@@ -117,5 +123,15 @@ object MasonPlugin extends AutoPlugin {
         )
         false
     }
+  }
+
+  def uploadTask: Def.Initialize[Task[Boolean]] = Def.task {
+    implicit val log        = sLog.value
+    val sourceFilePath      = masonSourceFileLoc.value
+    val destinationFilePath = masonDestinationFileLoc.value
+    val overwrite           = masonOverwriteFileUploads.value
+    val configParser        = new DatabricksConfigParser(masonConfigFile.value)
+    val api                 = new DatabricksAPI(masonEnvironmentName.value, configParser)
+    api.uploadFile(Path(sourceFilePath).asPath, destinationFilePath, overwrite)
   }
 }
