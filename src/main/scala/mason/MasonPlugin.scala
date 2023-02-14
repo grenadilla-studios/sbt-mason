@@ -125,7 +125,7 @@ object MasonPlugin extends AutoPlugin {
     }
   }
 
-  def uploadTask = Def.task {
+  def uploadTask: Def.Initialize[Task[Boolean]] = Def.task {
     implicit val log        = sLog.value
     val sourceFilePath      = masonSourceFileLoc.value
     val destinationFilePath = masonDestinationFileLoc.value
