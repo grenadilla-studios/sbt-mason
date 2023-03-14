@@ -18,10 +18,7 @@ object MasonPlugin extends AutoPlugin {
     masonClusterId              := "",
     masonConfigFile             := None,
     masonEnvironmentName        := "DEFAULT",
-    masonSourceFileLoc          := "",
-    masonDestinationFileLoc     := "",
     masonArtifactDestinationDir := "/FileStore/jars/",
-    masonOverwriteFileUploads   := true,
     masonUploadFile             := uploadTask.evaluated,
     masonPublishLibrary         := publishTask.value,
     masonRemoveLibrary          := removeLib.value,
@@ -126,10 +123,10 @@ object MasonPlugin extends AutoPlugin {
     }
   }
 
-  def uploadTask: Def.Initialize[InputTask[Boolean]] = Def.inputTask {
+  private def uploadTask = Def.inputTask {
     implicit val log = sLog.value
     // TODO: add a real parser here instead of just space-separated
-    val args         = spaceDelimited("args").parsed
+    val args = spaceDelimited("args").parsed
     assert(
       args.length == 3,
       "masonUploadFile requires exactly three arguments: <sourcePath> <destinationPath> <overwriteBool>"
