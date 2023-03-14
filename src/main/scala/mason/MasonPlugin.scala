@@ -2,6 +2,7 @@ package mason
 
 import sbt.Keys._
 import sbt._
+import sbt.complete.Parsers.spaceDelimited
 
 import java.nio.file.Files
 
@@ -21,7 +22,7 @@ object MasonPlugin extends AutoPlugin {
     masonDestinationFileLoc     := "",
     masonArtifactDestinationDir := "/FileStore/jars/",
     masonOverwriteFileUploads   := true,
-    masonUploadFile             := uploadTask.value,
+    masonUploadFile             := uploadTask.evaluated,
     masonPublishLibrary         := publishTask.value,
     masonRemoveLibrary          := removeLib.value,
     masonLibraryName            := name.value
@@ -125,11 +126,17 @@ object MasonPlugin extends AutoPlugin {
     }
   }
 
-  def uploadTask: Def.Initialize[Task[Boolean]] = Def.task {
-    implicit val log        = sLog.value
-    val sourceFilePath      = masonSourceFileLoc.value
-    val destinationFilePath = masonDestinationFileLoc.value
-    val overwrite           = masonOverwriteFileUploads.value
+  def uploadTask: Def.Initialize[InputTask[Boolean]] = Def.inputTask {
+    implicit val log = sLog.value
+    // TODO: add a real parser here instead of just space-separated
+    val args         = spaceDelimited("args").parsed
+    assert(
+      args.length == 3,
+      "masonUploadFile requires exactly three arguments: <sourcePath> <destinationPath> <overwriteBool>"
+    )
+    val sourceFilePath      = args(0)
+    val destinationFilePath = args(1)
+    val overwrite           = args(2).toBoolean
     val configParser        = new DatabricksConfigParser(masonConfigFile.value)
     val api                 = new DatabricksAPI(masonEnvironmentName.value, configParser)
     api.uploadFile(Path(sourceFilePath).asPath, destinationFilePath, overwrite)

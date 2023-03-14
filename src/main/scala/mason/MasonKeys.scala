@@ -10,26 +10,12 @@ trait MasonKeys {
     "Remove existing versions of the project from the configured Databricks cluster."
   )
 
-  lazy val masonUploadFile = taskKey[Boolean](
+  lazy val masonUploadFile = inputKey[Boolean](
     "Upload a file from a source location into Databricks."
-  )
-
-  lazy val masonOverwriteFileUploads = settingKey[Boolean](
-    """|Whether to overwrite uploaded files when uploading to Databricks.
-       |If set to false and the file already exists in Databricks, the upload task will fail.
-       |""".stripMargin
   )
 
   lazy val masonArtifactDestinationDir = settingKey[String](
     "The location in Databricks FS to store uploaded artifacts - default is `/FileStore/jars`."
-  )
-
-  lazy val masonSourceFileLoc = settingKey[String](
-    "The default location to look for files when uploading to Databricks."
-  )
-
-  lazy val masonDestinationFileLoc = settingKey[String](
-    "The default location in Databricks to upload files."
   )
 
   lazy val masonClusterId =
