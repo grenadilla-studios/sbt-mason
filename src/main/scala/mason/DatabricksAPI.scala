@@ -286,6 +286,34 @@ class DatabricksAPI(
   }
 
   /**
+   * Ensure the given directory exists in the databricks workspace. This request tries to create the
+   * directory every time, and Databricks does nothing if the directory already exists.
+   *
+   * @param directoryPath
+   *   the full path of the directory to be created
+   */
+  def ensureDirectory(directoryPath: String): Boolean = {
+    buildRequest[JsonObject](Method.POST, "workspace/mkdirs", Map.empty) match {
+      case None =>
+        logger.error("Unable to build request to make directories.")
+        false
+      case Some(req) => {
+        case class DirPath(path: String)
+        req.body(DirPath(directoryPath)).send(backend).is200 match {
+          case true => {
+            logger.success(s"Directory $directoryPath exists.")
+            true
+          }
+          case false => {
+            logger.warn(s"Failed to create directory $directoryPath")
+            false
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Upload an arbitrary scala/python/sql/r notebook file to Databricks workspace.
    *
    * @param sourceFilePath
@@ -310,24 +338,32 @@ class DatabricksAPI(
         logger.error("Unable to build request to upload file artifact.")
         false
       case Some(req) => {
-        req
-          .multipartBody(
-            multipartFile("content", sourceFilePath),
-            multipart("path", destinationFilePath),
-            multipart("overwrite", if (overwrite) "true" else "false"),
-            multipart("format", "SOURCE"),
-            multipart("language", detectLang(sourceFilePath.getFileName.toString))
-          )
-          .send(backend)
-          .is200 match {
-          case true =>
-            logger.success(
-              s"Uploaded file artifact ${sourceFilePath.toString} to ${destinationFilePath}"
+        val dirExists = ensureDirectory(
+          destinationFilePath.split("/").reverse.tail.reverse.mkString("/")
+        )
+        if (dirExists) {
+          val resp = req
+            .multipartBody(
+              multipartFile("content", sourceFilePath),
+              multipart("path", destinationFilePath),
+              multipart("overwrite", if (overwrite) "true" else "false"),
+              multipart("format", "SOURCE"),
+              multipart("language", detectLang(sourceFilePath.getFileName.toString))
             )
-            true
-          case false =>
-            logger.error(s"Failed to upload file artifact ${sourceFilePath.toString}")
-            false
+            .send(backend)
+          resp.is200 match {
+            case true =>
+              logger.success(
+                s"Uploaded file artifact ${sourceFilePath.toString} to ${destinationFilePath}"
+              )
+              true
+            case false =>
+              logger.error(s"Failed to upload file artifact ${sourceFilePath.toString}")
+              logger.error(resp.body.toString)
+              false
+          }
+        } else {
+          false
         }
       }
     }
