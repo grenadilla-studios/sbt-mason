@@ -30,7 +30,7 @@ class DatabricksConfigParser(fileLocation: Option[String])(implicit logger: Logg
               val settings = tail.takeWhile(!_.startsWith("["))
               val mapSettings: Map[String, String] =
                 settings.map(_.split("=")).map(a => (a(0).trim(), a(1).trim())).toMap
-              parseRecurse(Map(key -> mapSettings), tail.drop(settings.length))
+              parseRecurse(result ++ Map(key -> mapSettings), tail.drop(settings.length))
             }
             case false => parseRecurse(result, tail)
           }
